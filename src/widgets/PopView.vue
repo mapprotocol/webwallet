@@ -30,7 +30,6 @@
     },
     watch: {
       showItem(newValue) {
-        console.log('ShowImte', newValue);
       },
       show(newValue) {
         if (this.showItem != newValue) {

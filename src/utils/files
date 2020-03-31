@@ -1,0 +1,42 @@
+class Reader {
+  constructor(file) {
+    this.file = file;
+    this.reader = new FileReader();
+  }
+
+  async read(type = 'text') {
+    let _reader = this.reader;
+    return new Promise(resolve => {
+      this.reader.onload = function(e){
+        resolve(_reader.result);
+      };
+      if (!type) {
+        type = 'text';
+      }
+      if (type.toUpperCase() === 'ARRAYBUFFER') {
+        this.reader.readAsArrayBuffer(this.file);
+      } else if (type.toUpperCase() === 'BINARYSTRING') {
+        this.reader.readAsBinaryString(this.file);
+      } else if (type.toUpperCase() === 'DATAURL') {
+        this.reader.readAsDataURL(this.file);
+      } else {
+        this.reader.readAsText(this.file);
+      }
+    });
+  }
+
+  async down(name,data){
+    let alink = document.createElement('a');
+    alink.style.display='none';
+    alink.download = name;
+    let blob = new Blob([data]);
+    alink.href = URL.createObjectURL(blob);
+    document.body.appendChild(alink);
+    alink.click();
+    setTimeout(()=>{
+      document.body.removeChild(alink);
+    },1000);
+  }
+}
+
+module.exports = Reader;

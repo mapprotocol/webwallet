@@ -313,7 +313,7 @@
           password: '',
           amount: 0
         },
-        contracts: [],//已保存的合约数据 saved contracts data
+        contracts: [],//saved contracts data
         transferCoins:[],// can trans coins
         transferAccounts:[],//can trans coins
         transferBalances:[],//can trans coins
@@ -435,7 +435,6 @@
             key: 'mnemonic',
               index: 0
           };
-          //创建相关
           this.createForm = {
             coin: 'true',
             password: '',
@@ -776,64 +775,6 @@
       }
     },
     mounted() {
-      // let wallet = this.getWallet('true');
-      // wallet.update_contract('0x735bCe5ecc8455Eb9Bf8270aA138ce05E069b4c1');
-
-      let account={
-        mnemonic: "gate dynamic disorder degree despair tilt reward science bird wolf normal law",
-        address: "0xf7fd830fe15fbbb35fb6708ea72191848480f07e",
-        privateKey: "0xb58aedff58f4cbc3090ad85fac519151ece4900338a220418f05cec05ecad5f4",
-        keystore: JSON.stringify({
-          "encSeed": {
-            "encStr": "Xp0dz8V0g+ZY9sugx+1TXRnPqhKj77av13aVoyNqiBcJYcmnYNuoRM5Bsky8AzOLUI/pfgXhrE0kweDVoMVvgEf6x6/9OQ5s3RgIua7AdSLIIdvDbiq2QZ6LNlSOEc33R+msNoBKf2PnN2R0rDQGeGvfkGjcJJFgpXr9P+BB2AE41Tu7/nd+4g==",
-            "nonce": "8Y8f4KY2nssvz1G+LOPibTtZpVSS67lM"
-          },
-          "encHdRootPriv": {
-            "encStr": "HWZ9mhBv1GmbZfhginrU9C8hJ5/OQB71sF5RXXn6pytbXfbhc4fgCB0hMNtP3yg3X6rSxHtdplT/AqVl9gsDId5AztYxZRzYrofxBB5canxqp38BCzxi8mz0oUT1/b1Q88IAgBnEatiER8MeG3bAGca4kIheGZh3yYnHHkbXEg==",
-            "nonce": "CfCFmWsmtSZMJmUT7rVwwnd982Xr6ECO"
-          },
-          "addresses": ["816518a242afe47d8f6bc3516c12a773b19372b5"],
-          "encPrivKeys": {
-            "816518a242afe47d8f6bc3516c12a773b19372b5": {
-              "key": "mCoUo996H9KhQb+gvCpbG6sImOgy3tTkmJ0WTYe0wx+w26xDJvzwO7tjMBIWwrei",
-              "nonce": "cv20JojlVqbNZdYGMHGsAYNCMJGowG2N"
-            }
-          },
-          "hdPathString": "m/44'/60'/0'/0",
-          "salt": "wFOLcxj+KOG2ePIiGQU3aVDx4uEQPyLpxIhJY9H0uWI=",
-          "hdIndex": 1,
-          "version": 3
-        }),
-        "ethv3_keystore":JSON.stringify({
-          "version": 3,
-          "id": "02f57f17-f133-4b98-9b70-c2f3a19ba0bd",
-          "address": "f7fd830fe15fbbb35fb6708ea72191848480f07e",
-          "crypto": {
-            "ciphertext": "fd3d67338530e7feff786e2fa6c8b75ac4fddc63ece24b5d4c8a2529f811ea68",
-            "cipherparams": {
-              "iv": "07ee24b9f6fb9a3da9da3c3054e8e80f"
-            },
-            "cipher": "aes-128-ctr",
-            "kdf": "scrypt",
-            "kdfparams": {
-              "dklen": 32,
-              "salt": "ddd74c75d9addc3607fa638ff6f302c99ab1fadac4a2d02702415d26ee50785d",
-              "n": 8192,
-              "r": 8,
-              "p": 1
-            },
-            "mac": "142886eb8f885cb5472fdbbc094407c26f3c204b2e4b0e6da6e7d4a9e2b2dac1"
-          }
-        }),
-        coin: "true"
-      }
-      this.accounts.push(account);
-      this.account = account;
-      this.walletList.push(account['address']);
-      this.walletAddress=account['address'];
-      this.actionGetBalance();
-
-
     }
   };
 </script>

@@ -9,6 +9,7 @@ const cdn = {
     'https://files.marcopolo.link/script/vue.min.js',
     'https://files.marcopolo.link/script/axios.min.js',
     'https://files.marcopolo.link/script/vue-router.js',
+    'https://unpkg.com/vuex@3.1.3/dist/vuex.js'
   ]
 };
 module.exports = {

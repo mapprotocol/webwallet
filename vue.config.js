@@ -1,5 +1,5 @@
 const path = require('path');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+// const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const isProduction = process.env.NODE_ENV === 'production';
 const cdn = {
@@ -91,18 +91,18 @@ module.exports = {
       // product...
       config.plugins.push(
         //remove console
-        new UglifyJsPlugin({
-          uglifyOptions: {
-            compress: {
-              warnings: false,
-              drop_debugger: true,
-              drop_console: true,
-              pure_funcs: ['console.log', 'console.info']
-            },
-          },
-          sourceMap: false,
-          parallel: true,
-        })
+        // new UglifyJsPlugin({
+        //   uglifyOptions: {
+        //     compress: {
+        //       warnings: false,
+        //       drop_debugger: true,
+        //       drop_console: true,
+        //       pure_funcs: ['console.log', 'console.info']
+        //     },
+        //   },
+        //   sourceMap: false,
+        //   parallel: true,
+        // })
       );
     } else {
       // config for development...

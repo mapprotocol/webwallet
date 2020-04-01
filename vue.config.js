@@ -6,9 +6,9 @@ const cdn = {
   css: [
   ],
   js: [
-    'https://unpkg.com/vue@2.6.11/dist/vue.min.js',
-    'https://unpkg.com/axios/dist/axios.min.js',
-    'https://unpkg.com/vue-router/dist/vue-router.js',
+    'https://files.marcopolo.link/script/vue.min.js',
+    'https://files.marcopolo.link/script/axios.min.js',
+    'https://files.marcopolo.link/script/vue-router.js',
   ]
 };
 module.exports = {

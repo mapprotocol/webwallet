@@ -5,7 +5,6 @@
         <img class="nav-bar-logo" src="./assets/icon/icon_logo.png"/>
         <div class="nav-bar-name margin-left-14">{{$t('MarcopoloWallet')}} </div>
         <div class="flex-1"></div>
-        <div class="nav-bar-wifi">{{$t('CurrentGasFee')}}gwei</div>
         <div class="nav-bar-lang flex-row flex-item-center padding-left-14 padding-right-14"
         @click="showLang=true">{{$t('Language')}}：
           <div >{{languages[langIndex]}}

@@ -6,8 +6,10 @@ import App from './App.vue';
 import router from './router';
 import i18n from './alang';
 import store from './astore'
+import { clip } from './utils/clipboard';
 Vue.config.productionTip = false;
 Vue.prototype.$bus=Bus;
+Vue.prototype.$clip=clip;
 Vue.prototype.$timer = function (callback, time, limit, delay) {
   return new Timer(callback, time, limit, delay);
 };

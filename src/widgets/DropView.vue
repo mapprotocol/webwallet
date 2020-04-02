@@ -5,13 +5,13 @@
            style="height: 100%;"
            @click="showItem=!showItem">
         <slot></slot>
-        <div class="single-line flex-1">{{itemInfo}}</div>
+        <div class="single-line flex-1">{{getName(itemInfo)}}</div>
         <img class="drop_view-arrow" src="../assets/icon/icon_arrow_down.png"/>
       </div>
       <div v-show="showItem" class="drop_view-ground" @click="actionOnItemClick(itemInfo)"></div>
       <transition>
         <div v-show="showItem" class="drop_view" :style="height?{maxHeight:height+'px'}:{}">
-          <div v-for="(item,index) in items" class="drop_view-item" @click="actionOnItemClick(item,index)">{{item}}</div>
+          <div v-for="(item,index) in items" class="drop_view-item" @click="actionOnItemClick(item,index)">{{getName(item)}}</div>
           <!--<div class="drop_view-item" @click.stop="actionOnItemClick('TRUE')">TRUE</div>-->
         </div>
       </transition>
@@ -40,17 +40,46 @@
     watch:{
       showItem(newValue){
       },
+      itemInfo(){
+      },
       value(newValue){
         if (newValue != this.itemInfo) {
-          this.itemInfo = newValue;
+          this.itemInfo = this.getName(newValue);
         }
       }
     },
     methods: {
+      getName(chain){
+        if (!chain) {
+          return '';
+        }
+        chain = chain.toUpperCase();
+        if (chain === 'TRUE' || chain==='TRUECHAIN'){
+          return 'TrueChain';
+        }
+        if (chain === 'ETH' || chain==='ETHEREUM'){
+          return 'Ethereum';
+        }
+        return chain;
+      },
+      getCoin(chain){
+        if (!chain) {
+          return '';
+        }
+        chain = chain.toUpperCase();
+        if (chain === 'TRUE' || chain==='TRUECHAIN'){
+          return 'true';
+        }
+        if (chain === 'ETH' || chain==='ETHEREUM'){
+          return 'eth';
+        }
+        return chain;
+      },
       actionOnItemClick(row,index) {
         this.showItem = false;
         this.itemInfo = row;
-        this.$emit('onChange',this.itemInfo);
+        console.log('actionOnItemClick',this.getCoin(this.itemInfo));
+        this.$emit('onChange',this.getCoin(this.itemInfo));
         this.$emit('onChangeIndex',index);
 
       },
@@ -59,7 +88,7 @@
       }
     },
     mounted(){
-      this.itemInfo = this.value;
+      this.itemInfo = this.getName(this.value);
     }
   };
 </script>

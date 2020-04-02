@@ -42,8 +42,8 @@
     .flex-column;
     .flex-justify-center;
     .flex-item-center;
-    width:48px;
-    height:48px;
+    width:58px;
+    height:58px;
     background:rgba(255,255,255,1);
     border-radius:50%;
     font-size:12px;
@@ -51,8 +51,8 @@
     font-weight:bold;
     color:rgba(0,0,0,1);
     text-align: center;
-    padding-left: 2px;
-    padding-right: 2px;
+    padding-left: 4px;
+    padding-right: 4px;
     word-break: break-word;
   }
 

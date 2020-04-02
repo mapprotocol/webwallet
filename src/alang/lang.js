@@ -155,6 +155,11 @@ export default {
     "en": "Click to upload KEYSTORE file",
     "ko":"클릭하 KEYSTORE 파일 업로드"
   },
+  "UploadKEYSTORESuccess": {
+    "zh": "上传KEYSTORE成功",
+    "en": "File upload completed",
+    "ko":"파일 업로드 완료"
+  },
   "FillOutPassword": {
     "zh": "密码，未设置过不用填写",
     "en": "You haven't set password, you don't have to fill out this",

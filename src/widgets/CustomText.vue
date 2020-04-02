@@ -29,6 +29,11 @@
     watch:{
       inputValue(){
         this.actionOnChange(this.inputValue)
+      },
+      value(newValue){
+       if (newValue != this.inputValue) {
+         this.inputValue = newValue;
+       }
       }
     },
     methods:{

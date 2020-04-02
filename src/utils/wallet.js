@@ -81,6 +81,7 @@ class Wallet {
                 privateKey: '0x' + privatekey,// export private key
                 keystore: jsontext,// export keystore-bip39
                 ethv3_keystore: ethv3_keystore,// export ethv3keystore
+                password:pwd
               }));
             }
           });
@@ -120,19 +121,23 @@ class Wallet {
           let account = null;
           try {
             account = this.web3.eth.accounts.decrypt(ks, pwd);
+            account['password']=pwd;
           } catch (e) {
             return resolve(this.gen_result(null, 101, 'password errno'));
           }
           return resolve(this.gen_result(account));
         }
       } else {//
-        return resolve(await this.get_account(data));
+        return resolve(this.gen_result(await this.get_account(data)));
       }
     });
   }
 
-  async get_account(pk) {
+  async get_account(pk,password='') {
     let account = this.web3.eth.accounts.privateKeyToAccount(pk);
+    let keystore = this.web3.eth.accounts.encrypt(pk,password);
+    account['keystore']=JSON.stringify(keystore);
+    account['password']=password;
     return this.gen_result(account);
   }
 

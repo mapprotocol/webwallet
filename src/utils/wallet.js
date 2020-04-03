@@ -109,12 +109,20 @@ class Wallet {
               return resolve(null);
             }
             let address = ks.getAddresses()[0];
-            let privateKey = '0x' + ks.exportPrivateKey(address, pwDerivedKey);
+            let privateKey ='';
+            try {
+              privateKey = '0x' + ks.exportPrivateKey(address, pwDerivedKey);
+            } catch (e) {
+              console.log('导入钱包失败',e);
+              return resolve(null);
+            }
             let mnemonic = ks.getSeed(pwDerivedKey);
             return resolve(this.gen_result({
               address,
               privateKey,
-              mnemonic
+              mnemonic,
+              keystore:data.keystore,
+              password:pwd
             }));
           });
         } else {
@@ -122,6 +130,7 @@ class Wallet {
           try {
             account = this.web3.eth.accounts.decrypt(ks, pwd);
             account['password']=pwd;
+            account['keystore']=data.keystore;
           } catch (e) {
             return resolve(this.gen_result(null, 101, 'password errno'));
           }

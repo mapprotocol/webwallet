@@ -1,6 +1,10 @@
 <template>
   <div class="trans-item">
-    <div class="flex-1_5">{{formatItem(txid)}}</div>
+    <div class="flex-1_5">
+      <img class="trans-item-copy"
+           src="../assets/icon/icon_wallet.png"
+      @click="actionCopy"/>
+      {{formatItem(txid)}}</div>
     <div class="flex-1_5 trans-item-normal">{{formatItem(from)}}</div>
     <div v-if="status==='success' || status==true" class="flex-1 trans-item-normal">
       <img class="trans-item-status" src="../assets/icon/icon_success.png"/>
@@ -32,6 +36,13 @@
       return {};
     },
     methods: {
+      async actionCopy(target){
+        try {
+          await this.$clip(this.txid, target);
+          this.$success('CopySuccess');
+        } catch (e) {
+        }
+      },
       formatItem(row) {
         if (row && row.length > 12) {
           let subStr1 = row.substr(0, 6);
@@ -63,6 +74,14 @@
       color: rgba(230, 125, 0, 1);
     }
 
+  }
+  .trans-item-copy{
+    width: 20px;
+    padding-right: 8px;
+    &:hover{
+      cursor: pointer;
+      opacity: .7;
+    }
   }
   .trans-item-normal{
     font-size:15px;

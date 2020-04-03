@@ -1,4 +1,5 @@
 import './utils/stringutils'
+import 'js-base64'
 import {Timer} from './utils/timer'
 import Bus from './utils/bus'
 import Vue from 'vue';
@@ -9,6 +10,7 @@ import store from './astore'
 import { clip } from './utils/clipboard';
 Vue.config.productionTip = false;
 Vue.prototype.$bus=Bus;
+Vue.prototype.$base64=Base64;
 Vue.prototype.$clip=clip;
 Vue.prototype.$timer = function (callback, time, limit, delay) {
   return new Timer(callback, time, limit, delay);

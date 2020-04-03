@@ -22,13 +22,14 @@
           <div class="space-y-70"></div>
 
           <coin-item
-            :name="getName(account.coin)"
+            :name="getCoin(account.coin,2)"
             :amount="formatAmount(account.amount)"
             :currency="'$'+formatAmount(account.currency)"
             @onclick="actionOnClickCoinItem(account)"></coin-item>
           <coin-item
             v-for="(item,index) in contracts"
             :name="item.symbol"
+            :key="item.symbol"
             :amount="formatAmount(item.amount)"
             :currency="'$'+formatAmount(item.currency)"
             @onclick="actionOnClickCoinItem(item)"></coin-item>
@@ -42,7 +43,7 @@
         <!--right-->
         <div class="home-right">
           <div class="home-right-top padding-y-35 padding-left-35">
-            <div class="home-right-top-logo">{{getName(mainAccount.symbol?mainAccount.symbol:mainAccount.coin)}}</div>
+            <div class="home-right-top-logo">{{getCoin(mainAccount.symbol?mainAccount.symbol:mainAccount.coin,2)}}</div>
             <div class="padding-left-14">
               <div class="home-right-amount">{{formatAmount(mainAccount.amount)}}</div>
               <div class="home-right-currency">${{formatAmount(mainAccount.currency)}}</div>
@@ -76,6 +77,7 @@
               :to="item.to"
               :amount="item.amount"
               :coin="item.symbol"
+              :key="item.transactionHash"
             ></trans-item>
           </div>
 
@@ -98,8 +100,9 @@
         <div v-show="createTabIndex===0"
              class="create_dialog_content">
           <check-view v-model="createForm.coin"></check-view>
-          <input type="password" autocomplete="off" readonly style="display: none;">
-          <custom-input :place-holder="$t('WalletPassword')" type="password" v-model="createForm.password"/>
+          <form><input type="password" autocomplete="off" readonly style="display: none;">
+            <custom-input :place-holder="$t('WalletPassword')" type="password" v-model="createForm.password"/>
+          </form>
           <div class="padding-x-14">
             <div class="button-base" @click="actionCreateWallet">{{$t('ConfirmCreation')}}</div>
           </div>
@@ -135,7 +138,8 @@
                 </div>
 
               </div>
-              <input type="password" autocomplete="off" readonly style="display: none;">
+              <form style="display: none;"><input type="password" autocomplete="off" readonly style="display: none;">
+              </form>
               <custom-input :place-holder="$t('FillOutPassword')" type="password" v-model="importForm.password"/>
             </div>
 
@@ -152,7 +156,7 @@
     <custom-dialog
       v-model="showAddToken">
       <div class="token_dialog">
-        <title-view :tips="account.coin.toUpperCase()">{{$t('AddToken1')}}</title-view>
+        <title-view :tips="getName(account.coin)">{{$t('AddToken1')}}</title-view>
         <label-view :label="$t('ContractAddress')">
           <custom-text :place-holder="$t('EnterContractAddress')" v-model="tokenForm.address"></custom-text>
         </label-view>
@@ -403,6 +407,9 @@
       };
     },
     created() {
+      this.$bus.$on('clearWallets', () => {
+        this.actionImportLocal();
+      });
 
     },
     computed: {
@@ -499,22 +506,29 @@
         }
         return chain;
       },
-      getCoin(chain) {
+      getCoin(chain, size = 0) {
+        //
         if (!chain) {
           return '';
         }
-        chain = chain.toUpperCase();
-        if (chain === 'TRUE' || chain === 'TRUECHAIN') {
-          return 'true';
+        let name = chain.toUpperCase();
+        if (name === 'TRUE' || name === 'TRUECHAIN') {
+          name = 'true';
+        } else if (name === 'ETH' || name === 'ETHEREUM') {
+          name = 'eth';
+        } else {
+          name = chain;
         }
-        if (chain === 'ETH' || chain === 'ETHEREUM') {
-          return 'eth';
+        if (size == 0) {
+          return name;
+        } else if (size == 1) {
+          return name.toLowerCase();
+        } else {
+          return name.toUpperCase();
         }
-        return chain;
       },
       actionShowQR() {
         this.showQR = true;
-        console.log(this.walletAddress);
         if (this.walletAddress) {
           setTimeout(() => {
             new QRCode('QRAddress', {
@@ -529,7 +543,7 @@
       async actionClip(target) {
         try {
           await this.$clip(this.walletAddress, target);
-          this.$success('复制成功');
+          this.$success('CopySuccess');
         } catch (e) {
         }
 
@@ -574,22 +588,18 @@
           this.$failed(this.$t('SelectCoin'));
           return;
         }
-        ;
         if (String.isEmpty(this.transForm.from)) {
           this.$failed(this.$t('SelectAddress'));
           return;
         }
-        ;
         if (String.isEmpty(this.transForm.to)) {
           this.$failed(this.$t('SelectReceivingAddress'));
           return;
         }
-        ;
         if (String.isEmpty(this.transForm.amount)) {
           this.$failed(this.$t('EnterTransNumber'));
           return;
         }
-        ;
         let wallet = this.getWallet(this.transForm.coin.toLowerCase());
         this.transForm.loading = true;
         if (this.transAccount.hasOwnProperty('account')) {
@@ -607,7 +617,6 @@
             this.$failed(this.$t('TransferFailed'));
             return;
           }
-          this.$success(this.$t('TransferSuccess'));
         } else {
           let result = await wallet.send_trans({
             to: this.transForm.to,
@@ -621,8 +630,9 @@
             this.$failed(this.$t('TransferFailed'));
             return;
           }
-          this.$success(this.$t('TransferSuccess'));
         }
+        this.$success(this.$t('TransferSuccess'));
+        this.actionGetBalance();
       },
       //确认添加合约
       async actionAddToken() {
@@ -666,15 +676,30 @@
         this.actionUpdateLeftCoins();
 
       },
+      actionMatchCoinInfo(str) {
+        //
+        let coin = '';
+        let address = '';
+        str = str.replace(')', '');
+        let strs = str.split('(');
+        coin = strs[1];
+        address = strs[0];
+        return {
+          coin,
+          address
+        };
+      },
       //show /close wallet list
       actionShowWalletList(show) {
         this.showWalletList = show;
       },
       //change wallet
       actionChangeWallet(row) {
-        this.walletAddress = row;
+        let coinInfo = this.actionMatchCoinInfo(row);
+        this.walletAddress = coinInfo['address'];
         for (let item of this.accounts) {
-          if (item.address === this.walletAddress) {
+          if (item.address === this.walletAddress
+            && item.coin === coinInfo['coin']) {
             this.account = item;
             this.actionGetBalance();
             this.mainAccount = item;
@@ -710,7 +735,11 @@
             };
           }
           let result = await wallet.import_account(this.importTab['key'].toLowerCase(), data);
-          console.log('ImportResult', result);
+          this.importForm.loading = false;
+          if (!result) {
+            this.$failed('ImportFailedPalceCheckIt');
+            return;
+          }
           let wallets = localStorage.getItem('wallets');
           if (wallets) {
             wallets = JSON.parse(wallets);
@@ -720,7 +749,7 @@
           wallets[result['data']['address']] = {
             coin: this.importForm.coin,
             keystore: result['data']['keystore'],
-            password: result['data']['password']
+            password: this.$base64.encode(result['data']['password'])
           };
           localStorage.setItem('wallets', JSON.stringify(wallets));
           if (!result || !result['data']) {
@@ -730,21 +759,22 @@
           result['data']['coin'] = result['coin'];
           this.showCreate = false;
           for (let item of this.accounts) {
-            if (item['address'] === result['data']['address']) {
+            if (item['address'] === result['data']['address']
+              && item['coin'] === result['data']['coin']) {
               this.$success(this.$t('WalletAlready'));
               return;
             }
           }
           this.accounts.push(result['data']);
           this.account = result['data'];
-          this.walletList.push(result['data']['address']);
+          this.walletList.push(result['data']['address'] + `(${result['data']['coin']})`);
           this.walletAddress = result['data']['address'];
           this.mainAccount = {};
           this.actionUpdateMainAccount();
 
         } else {
         }
-        this.importForm.loading = false;
+
         this.actionGetBalance();
 
       },
@@ -774,7 +804,6 @@
         this.createForm.loading = false;
       },
       actionOnImportTabChange(tab) {
-        console.log('actionOnImportTabChange', tab);
         this.importTab = tab;
         this.importData = '';
         this.importForm.mnemonic = '';
@@ -901,23 +930,30 @@
           wallets = JSON.parse(wallets);
           for (let key in wallets) {
             let keystore = wallets[key];
+            keystore.password = this.$base64.decode(keystore.password);
             let wallet = this.getWallet(keystore['coin']);
             let result = await wallet.import_account('keystore', keystore);
             if (result) {
-              result['data']=Object.assign(result['data'],keystore);
+              result['data'] = Object.assign(result['data'], keystore);
               this.accounts.push(result['data']);
               this.account = result['data'];
-              this.walletList.push(result['data']['address']);
+              this.walletList.push(result['data']['address'] + `(${result['data']['coin']})`);
               this.walletAddress = result['data']['address'];
-              console.log('自动导入钱包成功',result);
             }
           }
+        } else {
+          this.account = {};
+          this.accounts = [];
+          this.mainAccount = [];
+          this.walletList = [];
+          this.walletAddress = '';
         }
         if (!this.account || !this.account.address) {
           this.showCreate = true;
-        }else {
+        } else {
           this.mainAccount = {};
           this.actionUpdateMainAccount();
+          this.actionGetBalance();
         }
       }
     },

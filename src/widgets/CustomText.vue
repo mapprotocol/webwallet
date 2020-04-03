@@ -61,6 +61,7 @@
       width: 100%;
       resize: none;
       padding: 14px;
+      outline: none;
     }
   }
 

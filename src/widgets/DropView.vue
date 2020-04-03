@@ -50,6 +50,9 @@
     },
     methods: {
       getName(chain){
+        if(typeof chain !=='string'){
+          return chain;
+        }
         if (!chain) {
           return '';
         }
@@ -63,6 +66,9 @@
         return chain;
       },
       getCoin(chain){
+        if(typeof chain !=='string'){
+          return chain;
+        }
         if (!chain) {
           return '';
         }

@@ -27,6 +27,14 @@ class WalletEth extends Wallet{
     });
   }
 
+  async get_balance(address) {
+    let result = await this.web3.eth.getBalance(address);
+    result = this.web3.utils.fromWei(result,'ether');
+    await this.update_gas_price();
+    return this.gen_result(result);
+  }
+
+
 }
 
 export default WalletEth;

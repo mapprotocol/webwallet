@@ -696,11 +696,15 @@
       },
       //change wallet
       actionChangeWallet(row) {
+        console.log('actionChangeWallet1',row);
         let coinInfo = this.actionMatchCoinInfo(row);
+        console.log('actionChangeWallet2',coinInfo);
         this.walletAddress = coinInfo['address'];
+        console.log('actionChangeWallet3',this.walletAddress);
         for (let item of this.accounts) {
+          console.log('actionChangeWallet4',item);
           if (item.address === this.walletAddress
-            && item.coin === coinInfo['coin']) {
+            && item.coin.toUpperCase() === coinInfo['coin'].toUpperCase()) {
             this.account = item;
             this.actionGetBalance();
             this.mainAccount = item;
@@ -768,7 +772,7 @@
           }
           this.accounts.push(result['data']);
           this.account = result['data'];
-          this.walletList.push(result['data']['address'] + `(${result['data']['coin']})`);
+          this.walletList.push(result['data']['address'] + `(${result['data']['coin'].toUpperCase()})`);
           this.walletAddress = result['data']['address'];
           this.mainAccount = {};
           this.actionUpdateMainAccount();
@@ -940,7 +944,7 @@
               result['data'] = Object.assign(result['data'], keystore);
               this.accounts.push(result['data']);
               this.account = result['data'];
-              this.walletList.push(result['data']['address'] + `(${result['data']['coin']})`);
+              this.walletList.push(result['data']['address'] + `(${result['data']['coin'].toUpperCase()})`);
               this.walletAddress = result['data']['address'];
             }
           }

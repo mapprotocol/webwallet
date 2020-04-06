@@ -152,6 +152,7 @@ class Wallet {
 
   async get_balance(address) {
     let result = await this.web3.eth.getBalance(address);
+    console.log('get_balance',result);
     return this.gen_result(result);
   }
 
@@ -287,7 +288,6 @@ class Wallet {
     });
   }
 
-
   async send_trans(obj) {
     return new Promise(async resolve => {
       let privateKey = obj.privateKey;
@@ -304,7 +304,7 @@ class Wallet {
             amount = this.web3.utils.toWei(amount, 'gwei');
           }
         } else {
-          amount = this.web3.utils.toWei(amount, 'gwei');
+          amount = this.web3.utils.toWei(amount, 'gther');
         }
       } catch (e) {
       }
@@ -316,7 +316,7 @@ class Wallet {
         gas_price = this.gas_price;
       }
 
-      // gas_price = ( parseInt( this.web3.utils.fromWei(gas_price,'gwei') ) + 5 ).toString();
+      gas_price = ( parseInt( this.web3.utils.fromWei(gas_price,'gwei') ) + 5 ).toString();
       gas_price = this.web3.utils.toBN(gas_price);
       gas_price = this.web3.utils.toWei(gas_price, 'gwei');
       var gas = this.ran_gas();
@@ -412,13 +412,15 @@ class Wallet {
 
   async update_gas_price() {
     return new Promise(resolve => {
-      this.web3.eth.getGasPrice((x) => {
-        this.gas_price = x;
-        let gweistr = this.web3.utils.fromWei(x, 'gwei');
+      this.web3.eth.getGasPrice((x,data) => {
+        this.gas_price = this.web3.utils.toBN(data);
+        let gweistr = this.web3.utils.fromWei(data, 'gwei');
+        console.log('update_gas_price',data,gweistr);
         if (gweistr.lastIndexOf('.') > 0) {
           gweistr = gweistr.substring(0, gweistr.lastIndexOf('.'));
         }
         this.gas_price_gwei = gweistr;
+
         resolve();
       });
     });

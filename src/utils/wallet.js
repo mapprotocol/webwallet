@@ -5,7 +5,7 @@
  *105 trans token coin error
  */
 import Contract from './contract';
-
+import Decimal from "decimal.js";
 class Result {
 
   constructor(data = {}, code = 0, msg = '') {
@@ -169,14 +169,17 @@ class Wallet {
         .then(balance => {
           let temp = new Contract().find(contractAddress, this.coin)
             .update();
+
           let dcl = 1;
           if (temp) {
             for (let i = 0; i < temp.decimal; i++) {
               dcl *= 10;
             }
           }
-          let result = new Decimal(balance).div(new Decimal(dcl).toNumber())
-            .toDP(5, Decimal.ROUND_DOWN);
+
+          let result = new Decimal(balance).div(new Decimal(dcl));
+            // .toDP(5, Decimal.ROUND_DOWN);
+          console.log('Get Contract Balance Result',balance,"dcl",dcl,parseFloat(balance)/dcl,result.toNumber());
           resolve(result);
         })
         .catch(e => {
@@ -248,6 +251,7 @@ class Wallet {
       let privateKey = obj.privateKey;
       this.web3.eth.accounts.signTransaction(tx, privateKey, async (err, data) => {
         if (err) {
+          console.log(err);
           resolve(this.gen_result(null, 104));
         } else {
           let account = await this.get_account(privateKey);
@@ -327,6 +331,7 @@ class Wallet {
       };
       this.web3.eth.accounts.signTransaction(tx, privateKey, async (err, data) => {
         if (err) {
+          console.log('Send Trans',err)
           resolve(this.gen_result(null, 104));
         } else {
           let account = await this.get_account(privateKey);
@@ -340,10 +345,11 @@ class Wallet {
             symbol: this.coin,
             coin: this.coin
           };
+          console.log('Send Trans111',data);
           //
           this.web3.eth.sendSignedTransaction(data.rawTransaction)
             .then((data) => {
-
+              console.log('Send Trans222',data);
               if (data) {
                 if (data['status']) {
                   result = Object.assign(result, data);

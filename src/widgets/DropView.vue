@@ -5,13 +5,13 @@
            style="height: 100%;"
            @click="showItem=!showItem">
         <slot></slot>
-        <div class="single-line flex-1">{{getName(itemInfo)}}</div>
+        <div class="single-line flex-1">{{getCoin(itemInfo)}}</div>
         <img class="drop_view-arrow" src="../assets/icon/icon_arrow_down.png"/>
       </div>
       <div v-show="showItem" class="drop_view-ground" @click="actionOnItemClick(itemInfo)"></div>
       <transition>
         <div v-show="showItem" class="drop_view" :style="height?{maxHeight:height+'px'}:{}">
-          <div v-for="(item,index) in items" class="drop_view-item" @click="actionOnItemClick(item,index)">{{getName(item)}}</div>
+          <div v-for="(item,index) in items" class="drop_view-item" @click="actionOnItemClick(item,index)">{{getCoin(item)}}</div>
           <!--<div class="drop_view-item" @click.stop="actionOnItemClick('TRUE')">TRUE</div>-->
         </div>
       </transition>
@@ -56,11 +56,11 @@
         if (!chain) {
           return '';
         }
-        chain = chain.toUpperCase();
-        if (chain === 'TRUE' || chain==='TRUECHAIN'){
+        let temp = chain.toUpperCase();
+        if (temp === 'TRUE' || temp === 'TRUECHAIN') {
           return 'TrueChain';
         }
-        if (chain === 'ETH' || chain==='ETHEREUM'){
+        if (temp === 'ETH' || temp === 'ETHEREUM') {
           return 'Ethereum';
         }
         return chain;
@@ -72,12 +72,12 @@
         if (!chain) {
           return '';
         }
-        chain = chain.toUpperCase();
-        if (chain === 'TRUE' || chain==='TRUECHAIN'){
-          return 'true';
+        let temp = chain.toUpperCase();
+        if (temp === 'TRUE' || temp === 'TRUECHAIN') {
+          return 'TRUE';
         }
-        if (chain === 'ETH' || chain==='ETHEREUM'){
-          return 'eth';
+        if (temp === 'ETH' || temp === 'ETHEREUM') {
+          return 'ETH';
         }
         return chain;
       },

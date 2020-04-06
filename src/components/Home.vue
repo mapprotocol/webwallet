@@ -452,7 +452,8 @@
           this.transForm.from = '';
           this.transForm.to = '';
           this.actionGetAllContractsAndAccounts();
-
+        }else {
+          this.transForm.loading = false;
         }
 
       },
@@ -489,7 +490,7 @@
           return '0.00';
         }
         if (num) {
-          return num;
+          return `${num}`;
         }
         return '0.00';
       },
@@ -497,11 +498,11 @@
         if (!chain) {
           return '';
         }
-        chain = chain.toUpperCase();
-        if (chain === 'TRUE' || chain === 'TRUECHAIN') {
+        let temp = chain.toUpperCase();
+        if (temp === 'TRUE' || temp === 'TRUECHAIN') {
           return 'TrueChain';
         }
-        if (chain === 'ETH' || chain === 'ETHEREUM') {
+        if (temp === 'ETH' || temp === 'ETHEREUM') {
           return 'Ethereum';
         }
         return chain;
@@ -840,7 +841,7 @@
               contract);
             let contractObj = new Contract().find(contract, this.account.coin)
               .update();
-            contracts[contract]['amount'] = contractBalance / contractObj.decimal;
+            contracts[contract]['amount'] = contractBalance ;
             contracts[contract].currency = wallet.match_currency_usd(contracts[contract]['symbol'], contracts[contract]['amount']);
             this.contracts.push(contracts[contract]);
           }
@@ -855,23 +856,24 @@
           if (allCoinNames.indexOf(item.coin.toUpperCase()) < 0) {
             allCoinNames.push(item.coin.toUpperCase());
           }
-        }
-        ;
+        };
         let all = new Contract().all();
         let keys = Object.keys(all);
         for (let key of keys) {
+
           if (allCoinNames.indexOf(key.toUpperCase()) < 0) {
             continue;
           }
           let contracts = all[key];
           for (let contractAddress in contracts) {
             let item = contracts[contractAddress];
-            if (allCoinNames.indexOf(`${item['symbol']}(${key.toUpperCase()})`) < 0) {
-              allCoinNames.push(`${item['symbol']}(${key.toUpperCase()})`);
+            if (allCoinNames.indexOf(`${item['symbol']}(${this.getName(key)})`) < 0) {
+              allCoinNames.push(`${item['symbol']}(${this.getName(key)})`);
             }
           }
         }
         this.transferCoins = allCoinNames;
+        console.log('actionGetAllContractsAndAccounts',this.transferCoins)
       },
       //get current main coins and contracts
       async actionGetAllAddresses(coin, symbol) {

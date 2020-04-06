@@ -877,7 +877,8 @@
       },
       //get current main coins and contracts
       async actionGetAllAddresses(coin, symbol) {
-
+        console.log('actionGetAllAddresses',coin,symbol);
+        coin = this.getCoin(coin);
         let allCoinAccounts = [];
         let transferBalances = [];
         //main
@@ -902,7 +903,7 @@
                   //get contract balance
                   let wallet = this.getWallet(coin);
                   let balance = await wallet.get_contract_balance(account['address'], temp['address']);
-                  balance = balance / temp.decimal;
+                  // balance = balance / temp.decimal;
                   temp['amount'] = balance;
                   temp['mc'] = account['address'];
                   allCoinAccounts.push(temp);

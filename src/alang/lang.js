@@ -349,12 +349,12 @@ export default {
   'PlaceLoginGreenBelt': {
     'zh': '请先登陆GreenBelt',
     'en': 'Place Login GreenBelt First',
-    'ko': '지갑 삭제'
+    'ko': '먼저 접속해 주세요 GreenBelt'
   },
   'PlaceLoginMetaMask': {
     'zh': '请先登陆MetaMask',
     'en': 'Place Login MetaMask First',
-    'ko': '지갑 삭제'
+    'ko': '먼저 접속해 주세요 MetaMask'
   }
 
 };

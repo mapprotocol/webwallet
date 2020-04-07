@@ -199,16 +199,19 @@
     },
     async mounted() {
       this.langIndex = this.$i18n.langIndex;
-      let isProduct = process.env.NODE_ENV !== 'development';
-      let baseUrl = isProduct ? 'https://usersideapi.marcopay.org' : '/api';
-      let resutl = await new Requester(baseUrl).get({}, '/api/queryTokenRate');
-      if (resutl['code'] === 200) {
-        resutl = resutl['data']['rateList'];
-        let rate_usd = {};
-        for (let item of resutl) {
-          rate_usd[item['token']] = item['price'];
+      try {
+        let isProduct = process.env.NODE_ENV !== 'development';
+        let baseUrl = isProduct ? 'https://usersideapi.marcopay.org' : '/api';
+        let resutl = await new Requester(baseUrl).get({}, '/api/queryTokenRate');
+        if (resutl['code'] === 200) {
+          resutl = resutl['data']['rateList'];
+          let rate_usd = {};
+          for (let item of resutl) {
+            rate_usd[item['token']] = item['price'];
+          }
+          localStorage.setItem('rate_usd', JSON.stringify(rate_usd));
         }
-        localStorage.setItem('rate_usd', JSON.stringify(rate_usd));
+      } catch (e) {
       }
     }
   };

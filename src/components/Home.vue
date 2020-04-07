@@ -913,6 +913,11 @@
               account['type'] = type;
               account['action'] = 'normal';
               address = account['address'];
+              if (!account['amount']){
+               let wallet = this.getWallet(account['coin']);
+               let result = await wallet.get_balance(account['address']);
+               account['amount']=result['data'];
+              }
               allCoinAccounts.push(account);
               transferBalances.push(`${account['address']} (${account['amount']} ${coin.toUpperCase()})`);
               console.log('actionGetAllAddresses Main Coin', coin, symbol, account);
@@ -964,6 +969,7 @@
         }
         this.transferBalances = transferBalances;
         this.transferAccounts = allCoinAccounts;
+        console.log(this.transferAccounts);
       },
       actionTransCoinIndexChange(index) {
         let transCoin = this.transferCoins[index];
@@ -982,6 +988,9 @@
 
       },
       actionTransFromIndexChange(index) {
+        if (index==undefined) {
+          index=0;
+        }
         let checkTransferAccount = this.transferAccounts[index];
         console.log('actionTransFromIndexChange step.3', index, checkTransferAccount);
         this.transAccount = checkTransferAccount;

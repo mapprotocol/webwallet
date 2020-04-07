@@ -38,10 +38,10 @@ class WalletTrue extends Wallet{
             clearTimeout(timer);
           }
           if (err) {
-            console.log('Mask 转账失败', err);
+            console.log('Mask Trans Failed', err);
             reject('transfer err');
           } else {
-            console.log('Mask 转账完成', data);
+            console.log('Mask Trans Success', data);
             this.web3.eth.getTransaction(data, (err, data) => {
               console.log('TransResult', err, data);
             });

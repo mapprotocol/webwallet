@@ -84,10 +84,10 @@ class WalletEth extends Wallet{
             clearTimeout(timer);
           }
           if (err) {
-            console.log('Mask 转账失败', err);
+            console.log('Mask Trans Failed', err);
             reject('transfer err');
           } else {
-            console.log('Mask 转账完成', data);
+            console.log('Mask Trans Success', data);
             // this.web3.eth.getTransaction(data, (err, data) => {
             //   console.log('TransResult', err, data);
             // });
@@ -95,7 +95,7 @@ class WalletEth extends Wallet{
           }
         });
       } catch (e) {
-        console.log('Mask 转账失败', e);
+        console.log('Mask Trans Failed', e);
         resolve(this.gen_result(null,106,'PlaceLoginMetaMask'))
       }
       // timer=setTimeout(()=>{

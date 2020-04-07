@@ -183,7 +183,11 @@
           <label-view :label="$t('Coin')" class="flex-1">
             <drop-view :items="transferCoins"
                        style="width: 190px;"
-                       v-model="transForm.coinItem"></drop-view>
+                       v-model="transForm.coinItem"
+                       @onChangeIndex="actionTransCoinIndexChange"
+            >
+
+            </drop-view>
           </label-view>
           <label-view :label="$t('From')" class="flex-2">
             <drop-view :items="transferBalances"
@@ -394,9 +398,9 @@
           name: '',//token
           contract: '',
           from: '',
-          to: '',
+          to: '0x6cc2a74058174cedcc1fb74970a66ed0f26c5f18',
           amount: 0,
-          loading: false
+          loading: false,
         },
         transAccount: {},
 
@@ -425,17 +429,17 @@
       'tokenForm.decimal'(newValue) {
       },
       'transForm.coinItem'(newValue) {
-        if (newValue.indexOf('(') >= 0) {
-          let temp = newValue.replace(')', '');
-          temp = temp.split('(');
-          this.transForm.coin = temp[1];
-          this.transForm.name = temp[0];
-        } else {
-          this.transForm.coin = newValue;
-          this.transForm.name = newValue;
-        }
-        this.transForm.from = '';
-        this.actionGetAllAddresses(this.transForm.coin, this.transForm.name);
+        // if (newValue.indexOf('(') >= 0) {
+        //   let temp = newValue.replace(')', '');
+        //   temp = temp.split('(');
+        //   this.transForm.coin = temp[1];
+        //   this.transForm.name = temp[0];
+        // } else {
+        //   this.transForm.coin = newValue;
+        //   this.transForm.name = newValue;
+        // }
+        // this.transForm.from = '';
+        // this.actionGetAllAddresses(this.transForm.coin, this.transForm.name);
       },
       showAddToken(newValue) {
         if (newValue) {
@@ -452,7 +456,7 @@
           this.transForm.from = '';
           this.transForm.to = '';
           this.actionGetAllContractsAndAccounts();
-        }else {
+        } else {
           this.transForm.loading = false;
         }
 
@@ -528,6 +532,14 @@
           return name.toUpperCase();
         }
       },
+      async actionClip(target) {
+        try {
+          await this.$clip(this.walletAddress, target);
+          this.$success('CopySuccess');
+        } catch (e) {
+        }
+
+      },
       actionShowQR() {
         this.showQR = true;
         if (this.walletAddress) {
@@ -541,14 +553,7 @@
 
         }
       },
-      async actionClip(target) {
-        try {
-          await this.$clip(this.walletAddress, target);
-          this.$success('CopySuccess');
-        } catch (e) {
-        }
 
-      },
       actionGetTransferLog() {
         let wallet = this.getWallet(this.mainAccount.coin);
         let transLog = wallet.get_trans_list(this.mainAccount.address);
@@ -585,6 +590,7 @@
       },
       //confirm trans
       async actionSubTransfer() {
+        console.log('actionSubTransfer', this.transForm, this.transAccount);
         if (String.isEmpty(this.transForm.name)) {
           this.$failed(this.$t('SelectCoin'));
           return;
@@ -601,25 +607,32 @@
           this.$failed(this.$t('EnterTransNumber'));
           return;
         }
-        let wallet = this.getWallet(this.transForm.coin.toLowerCase());
+        let wallet = this.getWallet(this.transAccount.coin.toLowerCase());
         this.transForm.loading = true;
-        if (this.transAccount.hasOwnProperty('account')) {
+        if (this.transAccount['type'] === 'contract') {
           //合约
-          let contract = wallet.get_contract(this.transAccount.address);
+          let contract = await wallet.get_contract(this.transAccount.address);
+          contract = contract['data'];
           let result = await wallet.send_token({
+            action: this.transAccount.action,
             to: this.transForm.to,
             val: this.transForm.amount,
-            privateKey: this.transAccount.account.privateKey,
+            privateKey: this.transAccount.privateKey,
             contract,
             gas_price: this.transForm.gasprice
           });
           this.transForm.loading = false;
+          if (result['code'] ==106) {
+            this.$failed(this.$t(result['msg']));
+            return;
+          }
           if (result['code'] !== 0) {
             this.$failed(this.$t('TransferFailed'));
             return;
           }
         } else {
           let result = await wallet.send_trans({
+            action: this.transAccount.action,
             to: this.transForm.to,
             val: this.transForm.amount,
             privateKey: this.transAccount.privateKey,
@@ -633,9 +646,10 @@
           }
         }
         this.$success(this.$t('TransferSuccess'));
+        this.showTransfer = false;
         this.actionGetBalance();
       },
-      //确认添加合约
+      //Confirm add contract
       async actionAddToken() {
         if (String.isEmpty(this.tokenForm.address)) {
           this.$failed(this.$t('EnterContractAddress1'));
@@ -696,13 +710,13 @@
       },
       //change wallet
       actionChangeWallet(row) {
-        console.log('actionChangeWallet1',row);
+        console.log('actionChangeWallet1', row);
         let coinInfo = this.actionMatchCoinInfo(row);
-        console.log('actionChangeWallet2',coinInfo);
+        console.log('actionChangeWallet2', coinInfo);
         this.walletAddress = coinInfo['address'];
-        console.log('actionChangeWallet3',this.walletAddress);
+        console.log('actionChangeWallet3', this.walletAddress);
         for (let item of this.accounts) {
-          console.log('actionChangeWallet4',item);
+          console.log('actionChangeWallet4', item);
           if (item.address === this.walletAddress
             && item.coin.toUpperCase() === coinInfo['coin'].toUpperCase()) {
             this.account = item;
@@ -712,6 +726,7 @@
             break;
           }
         }
+        //check mask
 
       },
       actionChoiceFile() {
@@ -836,6 +851,7 @@
           let result = await wallet.get_balance(this.walletAddress);
           this.account['amount'] = result['data'] / this.decimals[this.account.coin.toLowerCase()];
           this.account.currency = wallet.match_currency_usd(this.account.coin, this.account['amount']);
+          console.log('Action GetBalance Main', this.account);
           //get contract balance
           let contracts = new Contract().list(this.account.coin);
           for (let contract in contracts) {
@@ -845,26 +861,28 @@
               contract);
             let contractObj = new Contract().find(contract, this.account.coin)
               .update();
-            contracts[contract]['amount'] = contractBalance ;
+            contracts[contract]['amount'] = contractBalance;
+            contracts[contract]['privateKey'] = this.account['privateKey'];
+            contracts[contract]['password'] = this.account['password'];
+            contracts[contract]['keystore'] = this.account['keystore'];
             contracts[contract].currency = wallet.match_currency_usd(contracts[contract]['symbol'], contracts[contract]['amount']);
             this.contracts.push(contracts[contract]);
+            console.log('Action GetBalance Contract', contracts[contract]);
           }
         }
         this.actionUpdateMainAccount();
       },
-      //transfer
+      //transfer step.1
       async actionGetAllContractsAndAccounts() {
         let allCoinNames = [];
-        let allCoinAccounts = {};
         for (let item of this.accounts) {
           if (allCoinNames.indexOf(item.coin.toUpperCase()) < 0) {
             allCoinNames.push(item.coin.toUpperCase());
           }
-        };
+        }
         let all = new Contract().all();
         let keys = Object.keys(all);
         for (let key of keys) {
-
           if (allCoinNames.indexOf(key.toUpperCase()) < 0) {
             continue;
           }
@@ -877,30 +895,37 @@
           }
         }
         this.transferCoins = allCoinNames;
-        console.log('actionGetAllContractsAndAccounts',this.transferCoins)
+        console.log('actionGetAllContractsAndAccounts step.1', this.transferCoins.join(','));
       },
-      //get current main coins and contracts
+      //get current main coins and contracts step.2
       async actionGetAllAddresses(coin, symbol) {
-        console.log('actionGetAllAddresses',coin,symbol);
+        console.log('actionGetAllAddresses step.2', coin, symbol);
         coin = this.getCoin(coin);
         let allCoinAccounts = [];
         let transferBalances = [];
+        let type='main';
+        let address ='';
         //main
-        if (coin === symbol) {
+        if (coin.toUpperCase() == symbol.toUpperCase()) {
+
           for (let account of this.accounts) {
             if (account['coin'].toUpperCase() === coin.toUpperCase()) {
+              account['type'] = type;
+              account['action'] = 'normal';
+              address = account['address'];
               allCoinAccounts.push(account);
               transferBalances.push(`${account['address']} (${account['amount']} ${coin.toUpperCase()})`);
+              console.log('actionGetAllAddresses Main Coin', coin, symbol, account);
             }
           }
         }
         //contracts
         else {
+          type='contract';
           let all = new Contract().list(coin.toLowerCase());
           for (let contract in all) {
             let item = all[contract];
             if (item['symbol'] === symbol) {
-
               for (let account of this.accounts) {
                 let temp = JSON.parse(JSON.stringify(item));
                 if (account.coin.toUpperCase() == temp.coin.toUpperCase()) {
@@ -909,26 +934,56 @@
                   let balance = await wallet.get_contract_balance(account['address'], temp['address']);
                   // balance = balance / temp.decimal;
                   temp['amount'] = balance;
+                  temp['privateKey'] = account['privateKey'];
+                  temp['password'] = account['password'];
+                  temp['keystore'] = account['keystore'];
                   temp['mc'] = account['address'];
+                  temp['type'] = type;
+                  temp['action'] = 'normal';
+                  address = temp['address'];
                   allCoinAccounts.push(temp);
                   transferBalances.push(`${item['address']} (${balance} ${item['symbol']})`);
+                  console.log('actionGetAllAddresses Contract', coin, symbol);
                 }
               }
             }
           }
         }
+        let wallet = this.getWallet(this.getCoin(coin));
+        let result = await wallet.check_mask();
+        if (result) {
+          let mask = wallet.get_mask();
+          transferBalances.push(mask.name);
+          allCoinAccounts.push({
+            action: 'mask',
+            name: mask.name,
+            address: address,
+            coin:mask.coin,
+            type:type
+          });
+        }
         this.transferBalances = transferBalances;
         this.transferAccounts = allCoinAccounts;
       },
+      actionTransCoinIndexChange(index) {
+        let transCoin = this.transferCoins[index];
+        console.log('actionTransCoinIndexChange 转账第二步', index, transCoin);
+        if (transCoin.indexOf('(') >= 0) {
+          let temp = transCoin.replace(')', '');
+          temp = temp.split('(');
+          this.transForm.coin = temp[1];
+          this.transForm.name = temp[0];
+        } else {
+          this.transForm.coin = transCoin;
+          this.transForm.name = transCoin;
+        }
+        this.transForm.from = '';
+        this.actionGetAllAddresses(this.transForm.coin, this.transForm.name);
+
+      },
       actionTransFromIndexChange(index) {
         let checkTransferAccount = this.transferAccounts[index];
-        if (checkTransferAccount.hasOwnProperty('mc')) {
-          for (let account of this.accounts) {
-            if (account['address'] === checkTransferAccount['mc']) {
-              checkTransferAccount['account'] = account;
-            }
-          }
-        }
+        console.log('actionTransFromIndexChange step.3', index, checkTransferAccount);
         this.transAccount = checkTransferAccount;
       },
       async actionImportLocal() {
@@ -965,10 +1020,7 @@
       }
     },
     mounted() {
-
       this.actionImportLocal();
-
-
     }
   };
 </script>

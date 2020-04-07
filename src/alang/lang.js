@@ -345,6 +345,16 @@ export default {
     'zh': '清空钱包',
     'en': 'Remove Wallets',
     'ko': '지갑 삭제'
+  },
+  'PlaceLoginGreenBelt': {
+    'zh': '请先登陆GreenBelt',
+    'en': 'Place Login GreenBelt First',
+    'ko': '지갑 삭제'
+  },
+  'PlaceLoginMetaMask': {
+    'zh': '请先登陆MetaMask',
+    'en': 'Place Login MetaMask First',
+    'ko': '지갑 삭제'
   }
 
 };

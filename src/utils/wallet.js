@@ -3,6 +3,7 @@
  *102 generate account failed
  *104 trans main coin error
  *105 trans token coin error
+ *106 place login greenbelt/metamask
  */
 import Contract from './contract';
 import Decimal from "decimal.js";
@@ -34,6 +35,7 @@ class Wallet {
     this.web3 = web3;
     this.lightwallet = lightwallet;
     this.keystore = lightwallet.keystore;
+    this.provider=null;
   }
 
   gen_result(data, code = 0, msg = '') {
@@ -71,10 +73,10 @@ class Wallet {
               resolve(this.gen_result(null, 102, 'Generate Account Errno'));
             } else {
               ks.generateNewAddress(pwDerivedKey, 1);
-              var addrs = ks.getAddresses();
-              var jsontext = ks.serialize();
-              var privatekey = ks.exportPrivateKey(addrs[0], pwDerivedKey);
-              var ethv3_keystore = JSON.stringify(this.web3.eth.accounts.encrypt('0x' + privatekey, pwd));
+              let addrs = ks.getAddresses();
+              let jsontext = ks.serialize();
+              let privatekey = ks.exportPrivateKey(addrs[0], pwDerivedKey);
+              let ethv3_keystore = JSON.stringify(this.web3.eth.accounts.encrypt('0x' + privatekey, pwd));
               resolve(this.gen_result({
                 mnemonic,// export mnemonic
                 address: addrs[0],// export address
@@ -152,7 +154,7 @@ class Wallet {
 
   async get_balance(address) {
     let result = await this.web3.eth.getBalance(address);
-    console.log('get_balance',result);
+    // console.log('get_balance',result);
     return this.gen_result(result);
   }
 
@@ -180,7 +182,7 @@ class Wallet {
 
           let result = new Decimal(balance).div(new Decimal(dcl));
             // .toDP(5, Decimal.ROUND_DOWN);
-          console.log('Get Contract Balance Result',balance,"dcl",dcl,parseFloat(balance)/dcl,result.toNumber());
+          // console.log('Get Contract Balance Result',balance,"dcl",dcl,parseFloat(balance)/dcl,result.toNumber());
           resolve(result);
         })
         .catch(e => {
@@ -207,11 +209,11 @@ class Wallet {
   add_trans(address, data) {
     let transfersAll = localStorage.getItem('transfers');
     let transfers = {};
-    if (transfersAll && transfersAll[address]) {
-      transfersAll = JSON.parse(transfersAll);
+    if (transfersAll){
+      transfersAll=JSON.parse(transfersAll);
       transfers = transfersAll[address];
-    } else {
-      transfersAll = {};
+    }else {
+      transfersAll={};
     }
     if (!transfers['items']) {
       transfers = {
@@ -225,12 +227,12 @@ class Wallet {
   }
 
   async send_token(obj) {
+    console.log('send_token',obj);
     return new Promise(async (resolve) => {
       let send_num = this.web3.utils.toWei(obj.val);
-      var contract = obj.contract;
-      var encode_abi = contract.methods.transfer(obj.to, send_num)
-        .encodeABI();
-      var gas = ran_gas();
+      let contract = obj.contract;
+      let encode_abi = contract.methods.transfer(obj.to, send_num).encodeABI();
+      let gas = this.ran_gas();
       if (obj.gas) {
         gas = parseInt(obj.gas);
       }
@@ -241,59 +243,69 @@ class Wallet {
         await this.update_gas_price();
         gas_price = this.gas_price;
       }
-      gas_price = (parseInt(web3.utils.fromWei(gas_price, 'gwei')) + 5).toString();
-      gas_price = web3.utils.toWei(gas_price, 'gwei');
-      var tx = {
+      gas_price = this.web3.utils.toBN(gas_price);
+      gas_price = (parseInt(this.web3.utils.fromWei(gas_price, 'gwei')) + 5).toString();
+      gas_price = this.web3.utils.toWei(gas_price, 'gwei');
+      let tx = {
         to: contract.options.address,  //
         gas: gas,
         gasPrice: gas_price,
         data: encode_abi //
       };
-      let privateKey = obj.privateKey;
-      this.web3.eth.accounts.signTransaction(tx, privateKey, async (err, data) => {
-        if (err) {
-          console.log(err);
+      if (obj.action==='mask'){
+        try {
+          let result = await this.send_mask(tx);
+          // this.add_trans(account.address, result);
+          resolve(this.gen_result(result));
+        } catch (e) {
+          console.log('Send Token Mask',e);
           resolve(this.gen_result(null, 104));
-        } else {
-          let account = await this.get_account(privateKey);
-          let userContract = new Contract().find(contract.options.address, this.coin);
-          account = account['data'];
-          let result = {
-            from: account.address,
-            to: obj.to,
-            amount: obj.val,
-            type: 'out',
-            contract: userContract.address,
-            name: userContract.name,
-            symbol: userContract.symbol,
-            coin: this.coin
-          };
-          //
-          this.web3.eth.sendSignedTransaction(data.rawTransaction)
-            .then((data) => {
-              if (data) {
-                if (data['status']) {
-                  result = Object.assign(result, data);
-                  this.add_trans(account.address, result);
-                  resolve(this.gen_result(result));
+        }
+      } else {
+        let privateKey = obj.privateKey;
+        this.web3.eth.accounts.signTransaction(tx, privateKey, async (err, data) => {
+          if (err) {
+            console.log(err);
+            resolve(this.gen_result(null, 104));
+          } else {
+            let account = await this.get_account(privateKey);
+            let userContract = new Contract().find(contract.options.address, this.coin).update();
+            account = account['data'];
+            let result = {
+              from: account.address,
+              to: obj.to,
+              amount: obj.val,
+              type: 'out',
+              contract: userContract.address,
+              name: userContract.name,
+              symbol: userContract.symbol,
+              coin: this.coin
+            };
+            //
+            this.web3.eth.sendSignedTransaction(data.rawTransaction)
+              .then((data) => {
+                if (data) {
+                  if (data['status']) {
+                    result = Object.assign(result, data);
+                    this.add_trans(account.address, result);
+                    resolve(this.gen_result(result));
+                  } else {
+                    resolve(this.gen_result(null, 104));
+                  }
                 } else {
                   resolve(this.gen_result(null, 104));
                 }
-              } else {
-                resolve(this.gen_result(null, 104));
-              }
-            });
-        }
-      });
+              });
+          }
+        });
+      }
     });
   }
 
   async send_trans(obj) {
+    console.log('send_trans',obj);
     return new Promise(async resolve => {
-      let privateKey = obj.privateKey;
-      if (privateKey.indexOf('0x') < 0) {
-        privateKey = '0x' + privateKey;
-      }
+      // let amount = this.web3.utils.toBN(obj.val);
       let amount = `${obj.val}`;
       try {
         if (obj.val_type) {
@@ -315,57 +327,86 @@ class Wallet {
         await this.update_gas_price();
         gas_price = this.gas_price;
       }
-
-      gas_price = ( parseInt( this.web3.utils.fromWei(gas_price,'gwei') ) + 5 ).toString();
       gas_price = this.web3.utils.toBN(gas_price);
+      gas_price = ( parseInt( this.web3.utils.fromWei(gas_price,'gwei') ) + 5 ).toString();
       gas_price = this.web3.utils.toWei(gas_price, 'gwei');
-      var gas = this.ran_gas();
+      let gas = this.ran_gas();
       if (obj.gas) {
         gas = parseInt(obj.gas);
       }
-      var tx = {
+      let tx = {
         to: obj.to,
         value: amount,
         gas: gas,
         gasPrice: gas_price
       };
-      this.web3.eth.accounts.signTransaction(tx, privateKey, async (err, data) => {
-        if (err) {
-          console.log('Send Trans',err)
+      let tx2 = {
+        to: obj.to,
+        value: amount,
+        gas: gas,
+        gasPrice: gas_price
+      };
+      if (obj.action==='mask'){
+        console.log('吊起插件0',tx2)
+        try {
+          let result = await this.send_mask(tx2);
+          resolve(this.gen_result(result));
+        } catch (e) {
+          console.log('Send Trans Mask',e);
           resolve(this.gen_result(null, 104));
-        } else {
-          let account = await this.get_account(privateKey);
-          account = account['data'];
-          let result = {
-            from: account.address,
-            to: obj.to,
-            amount: obj.val,
-            type: 'out',
-            name: this.coin,
-            symbol: this.coin,
-            coin: this.coin
-          };
-          console.log('Send Trans111',data);
-          //
-          this.web3.eth.sendSignedTransaction(data.rawTransaction)
-            .then((data) => {
-              console.log('Send Trans222',data);
-              if (data) {
-                if (data['status']) {
-                  result = Object.assign(result, data);
-                  this.add_trans(account.address, result);
-                  resolve(this.gen_result(result));
+        }
+      } else {
+        let privateKey = obj.privateKey;
+        if (privateKey.indexOf('0x') < 0) {
+          privateKey = '0x' + privateKey;
+        }
+        this.web3.eth.accounts.signTransaction(tx, privateKey, async (err, data) => {
+          if (err) {
+            console.log('Send Trans',err)
+            resolve(this.gen_result(null, 104));
+          } else {
+            let account = await this.get_account(privateKey);
+            account = account['data'];
+            let result = {
+              from: account.address,
+              to: obj.to,
+              amount: obj.val,
+              type: 'out',
+              name: this.coin,
+              symbol: this.coin,
+              coin: this.coin
+            };
+            console.log('Send Trans111',data);
+            //
+            this.web3.eth.sendSignedTransaction(data.rawTransaction)
+              .then((data) => {
+                console.log('Send Trans222',data);
+                if (data) {
+                  if (data['status']) {
+                    result = Object.assign(result, data);
+                    this.add_trans(account.address, result);
+                    resolve(this.gen_result(result));
+                  } else {
+                    resolve(this.gen_result(null, 104));
+                  }
+
                 } else {
                   resolve(this.gen_result(null, 104));
                 }
+              });
+          }
+        });
+      }
 
-              } else {
-                resolve(this.gen_result(null, 104));
-              }
-            });
-        }
-      });
     });
+  }
+
+  //todo true/eth
+  async check_mask(){}
+  //todo token/trans
+  async send_mask(obj){}
+  get_mask(){
+    return "";
   }
 
   /**

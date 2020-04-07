@@ -8,6 +8,8 @@ class WalletEth extends Wallet{
     // super(lightWallet,new Web3('https://api.etherscan.io'),'eth');
     // super(lightWallet,new Web3('https://mainnet.infura.io/','infura'),'eth');
     super(lightWallet,new Web3(new Web3.providers.HttpProvider("https://ethrpc.truewallet.net")),'eth');
+    this.account=null;
+    this.mask=null;
   }
 
   async get_contract(address){
@@ -33,6 +35,83 @@ class WalletEth extends Wallet{
     await this.update_gas_price();
     return this.gen_result(result);
   }
+
+  async check_mask(){
+    console.log('Check Mask METAMASK');
+    return new Promise(resolve => {
+      const mask = window.ethereum;
+      if (mask && mask.isMetaMask){
+        this.provider = mask.currentProvider;
+        this.mask = new Web3(this.provider);
+        console.log('Check Mask METAMASK',true);
+        mask.enable().then((accounts)=>{
+          console.log('CehckMask Account',accounts)
+          this.account = accounts[0];
+          resolve(true);
+        }).catch((reason)=>{
+          console.log('CehckMask reason',reason)
+          resolve(false);
+        });
+      }else {
+        resolve(false);
+      }
+    })
+    // console.log('Check Mask METAMASK');
+    // console.log('Check Mask METAMASK',false);
+    // return false;
+  }
+  async send_mask(obj){
+    console.log('Send Mask METAMASK',obj);
+    obj['from']=this.account;
+    // obj['method']='eth_sendTransaction';
+    return new Promise(async (resolve ,reject)=>{
+      let timer=null;
+      try {
+        // window.ethereum.sendAsync(obj,async(err,data)=>{
+        //   if (err) {
+        //     console.log('Mask 转账失败', err);
+        //     reject('transfer err');
+        //   } else {
+        //     console.log('Mask 转账完成', data);
+        //     // this.web3.eth.getTransaction(data, (err, data) => {
+        //     //   console.log('TransResult', err, data);
+        //     // });
+        //     resolve(this.gen_result({ txid: data.result }));
+        //   }
+        // });
+        web3.eth.sendTransaction(obj, async (err, data) => {
+          if (timer) {
+            clearTimeout(timer);
+          }
+          if (err) {
+            console.log('Mask 转账失败', err);
+            reject('transfer err');
+          } else {
+            console.log('Mask 转账完成', data);
+            // this.web3.eth.getTransaction(data, (err, data) => {
+            //   console.log('TransResult', err, data);
+            // });
+            resolve(this.gen_result({ txid: data }));
+          }
+        });
+      } catch (e) {
+        console.log('Mask 转账失败', e);
+        resolve(this.gen_result(null,106,'PlaceLoginMetaMask'))
+      }
+      // timer=setTimeout(()=>{
+      //   resolve(this.gen_result(null,100,'time out'));
+      // },5000);
+    });
+  }
+
+  get_mask(){
+    return {
+      name:"MetaMask",
+      symbol:'metamask',
+      coin:'eth'
+    };
+  }
+
 
 
 }

@@ -340,16 +340,9 @@ class Wallet {
         gas: gas,
         gasPrice: gas_price
       };
-      let tx2 = {
-        to: obj.to,
-        value: amount,
-        gas: gas,
-        gasPrice: gas_price
-      };
       if (obj.action==='mask'){
-        console.log('吊起插件0',tx2)
         try {
-          let result = await this.send_mask(tx2);
+          let result = await this.send_mask(tx);
           resolve(this.gen_result(result));
         } catch (e) {
           console.log('Send Trans Mask',e);

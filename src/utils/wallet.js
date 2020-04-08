@@ -181,7 +181,7 @@ class Wallet {
           }
 
           let result = new Decimal(balance).div(new Decimal(dcl));
-            // .toDP(5, Decimal.ROUND_DOWN);
+          // .toDP(5, Decimal.ROUND_DOWN);
           // console.log('Get Contract Balance Result',balance,"dcl",dcl,parseFloat(balance)/dcl,result.toNumber());
           resolve(result);
         })
@@ -244,7 +244,7 @@ class Wallet {
         gas_price = this.gas_price;
       }
       gas_price = this.web3.utils.toBN(gas_price);
-      gas_price = (parseInt(this.web3.utils.fromWei(gas_price, 'gwei')) + 5).toString();
+      gas_price = (parseInt(this.web3.utils.fromWei(gas_price.toString(), 'gwei')) + 5).toString();
       gas_price = this.web3.utils.toWei(gas_price, 'gwei');
       let tx = {
         to: contract.options.address,  //
@@ -320,7 +320,7 @@ class Wallet {
         }
       } catch (e) {
       }
-      let gas_price = '0';
+      let gas_price;
       if (obj.gas_price) {
         gas_price = obj.gas_price;
       } else {
@@ -328,8 +328,13 @@ class Wallet {
         gas_price = this.gas_price;
       }
       gas_price = this.web3.utils.toBN(gas_price);
-      gas_price = ( parseInt( this.web3.utils.fromWei(gas_price,'gwei') ) + 5 ).toString();
+      console.log('gas_price   1',gas_price,typeof gas_price);
+      gas_price = (parseInt(this.web3.utils.fromWei(gas_price.toString(), 'gwei')) + 5).toString();
+      // gas_price = ( parseInt( this.web3.utils.fromWei(gas_price,'gwei') ) + 5 ).toString();
+      console.log('gas_price   2',gas_price)
       gas_price = this.web3.utils.toWei(gas_price, 'gwei');
+      console.log('gas_price   3',gas_price)
+
       let gas = this.ran_gas();
       if (obj.gas) {
         gas = parseInt(obj.gas);

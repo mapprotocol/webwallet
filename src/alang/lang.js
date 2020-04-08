@@ -355,6 +355,11 @@ export default {
     'zh': '请先登陆MetaMask',
     'en': 'Place Login MetaMask First',
     'ko': '먼저 접속해 주세요 MetaMask'
+  },
+  'BalanceisNotEnough': {
+    'zh': '用户余额不足',
+    'en': 'Balance is Not Enough',
+    'ko': '잔고가 부족하다'
   }
 
 };

@@ -607,10 +607,19 @@
           this.$failed(this.$t('EnterTransNumber'));
           return;
         }
+        console.log(this.transForm);
+        console.log(this.transAccount);
         let wallet = this.getWallet(this.transAccount.coin.toLowerCase());
+        if (this.transAccount.action !='mask'){
+          let gas = wallet.web3.utils.fromWei(`${this.transForm.gasprice}`);
+          if ((parseFloat(this.transForm.amount)+parseFloat(gas))>this.transAccount.amount){
+            this.$failed(this.$t('BalanceisNotEnough'));
+            return
+          }
+        }
         this.transForm.loading = true;
         if (this.transAccount['type'] === 'contract') {
-          //合约
+          //contract
           let contract = await wallet.get_contract(this.transAccount.address);
           contract = contract['data'];
           let result = await wallet.send_token({
@@ -914,9 +923,9 @@
               account['action'] = 'normal';
               address = account['address'];
               if (!account['amount']){
-               let wallet = this.getWallet(account['coin']);
-               let result = await wallet.get_balance(account['address']);
-               account['amount']=result['data'];
+                let wallet = this.getWallet(account['coin']);
+                let result = await wallet.get_balance(account['address']);
+                account['amount']=result['data'];
               }
               allCoinAccounts.push(account);
               transferBalances.push(`${account['address']} (${account['amount']} ${coin.toUpperCase()})`);
@@ -1029,6 +1038,25 @@
       }
     },
     mounted() {
+      //default contract
+      let contracts = localStorage.getItem('contracts');
+      if (contracts){
+        contracts = JSON.parse(contracts);
+      }else{
+        contracts={};
+      }
+      if (!contracts['true']){
+        contracts['true']={}
+      }
+      contracts['true']['0x735bCe5ecc8455Eb9Bf8270aA138ce05E069b4c1']={
+        address: "0x735bCe5ecc8455Eb9Bf8270aA138ce05E069b4c1",
+        coin: "true",
+        name: "MarcoPolo",
+        profile: "map",
+        decimal: "18",
+        symbol: "MAP",
+      };
+      localStorage.setItem('contracts',JSON.stringify(contracts));
       this.actionImportLocal();
     }
   };

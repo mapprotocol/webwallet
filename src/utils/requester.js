@@ -22,7 +22,7 @@ class Requester {
           }
         }
       };
-      this.xhr.open('get', `${this.baseUrl}${path}`);
+      this.xhr.open('GET', `${this.baseUrl}${path}`);
       this.xhr.send(JSON.stringify(params));
     });
   }

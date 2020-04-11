@@ -202,7 +202,8 @@
       try {
         let isProduct = process.env.NODE_ENV !== 'development';
         let baseUrl = isProduct ? 'https://usersideapi.marcopay.org' : '/api';
-        let resutl = await new Requester(baseUrl).get({}, '/api/queryTokenRate');
+        // let baseUrl = 'https://usersideapi.marcopay.org';
+        let resutl = await new Requester(baseUrl).get({}, '/api/queryTokenRate',false);
         if (resutl['code'] === 200) {
           resutl = resutl['data']['rateList'];
           let rate_usd = {};

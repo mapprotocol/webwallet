@@ -67,18 +67,6 @@ class WalletEth extends Wallet{
     return new Promise(async (resolve ,reject)=>{
       let timer=null;
       try {
-        // window.ethereum.sendAsync(obj,async(err,data)=>{
-        //   if (err) {
-        //     console.log('Mask 转账失败', err);
-        //     reject('transfer err');
-        //   } else {
-        //     console.log('Mask 转账完成', data);
-        //     // this.web3.eth.getTransaction(data, (err, data) => {
-        //     //   console.log('TransResult', err, data);
-        //     // });
-        //     resolve(this.gen_result({ txid: data.result }));
-        //   }
-        // });
         web3.eth.sendTransaction(obj, async (err, data) => {
           if (timer) {
             clearTimeout(timer);
@@ -88,9 +76,6 @@ class WalletEth extends Wallet{
             reject('transfer err');
           } else {
             console.log('Mask Trans Success', data);
-            // this.web3.eth.getTransaction(data, (err, data) => {
-            //   console.log('TransResult', err, data);
-            // });
             resolve(this.gen_result({ txid: data }));
           }
         });

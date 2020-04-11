@@ -16,7 +16,7 @@
       <img class="trans-item-status" src="../assets/icon/icon_pending.png"/>
     </div>
     <div class="flex-1_5 trans-item-normal">{{formatItem(to)}}</div>
-    <div class="flex-2 trans-item-normal">{{amount}}{{coin}}</div>
+    <div class="flex-2 trans-item-normal">{{amount}} {{toUpperCase(coin)}}</div>
   </div>
 </template>
 
@@ -36,6 +36,12 @@
       return {};
     },
     methods: {
+      toUpperCase(str){
+        if (str) {
+          return str.toUpperCase();
+        }
+        return str;
+      },
       async actionCopy(target){
         try {
           await this.$clip(this.txid, target);

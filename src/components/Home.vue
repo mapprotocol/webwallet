@@ -441,6 +441,11 @@
         // this.transForm.from = '';
         // this.actionGetAllAddresses(this.transForm.coin, this.transForm.name);
       },
+      'transForm.amount'(newValue){
+        if (`${newValue}`.indexOf('-')>=0) {
+          this.transForm.amount=`${newValue}`.replace('-','');
+        }
+      },
       showAddToken(newValue) {
         if (newValue) {
           this.tokenForm.address = '';

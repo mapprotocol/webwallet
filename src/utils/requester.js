@@ -5,11 +5,10 @@ class Requester {
     this.header = headers ? headers : {};
     this.baseUrl = baseUrl;
     this.xhr = new XMLHttpRequest();
-    this.xhr.withCredentials = true;
-
   }
 
-  async get(params, path) {
+  async get(params, path,withCredentials=true) {
+    this.xhr.withCredentials = withCredentials;
     return new Promise(resolve => {
       let _this = this;
       this.xhr.onreadystatechange = function () {

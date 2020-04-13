@@ -199,7 +199,8 @@ class Wallet {
       transfers = {};
     }
     transfers = transfers[address];
-    if (transfers && transfers['items']) {
+    console.log("=======get_trans_list========",address,transfers);
+    if (transfers) {
       return transfers['items'];
     }
     return [];
@@ -207,6 +208,7 @@ class Wallet {
 
   //add transfer log
   add_trans(address, data) {
+
     let transfersAll = localStorage.getItem('transfers');
     let transfers = {};
     if (transfersAll){
@@ -215,7 +217,7 @@ class Wallet {
     }else {
       transfersAll={};
     }
-    if (!transfers['items']) {
+    if (!transfers || !transfers['items']){
       transfers = {
         items: [],
         time: new Date().getTime()
@@ -223,6 +225,7 @@ class Wallet {
     }
     transfers['items'].push(data);
     transfersAll[address] = transfers;
+    console.log("======add_trans======",address,data);
     localStorage.setItem('transfers', JSON.stringify(transfersAll));
   }
 
@@ -382,7 +385,8 @@ class Wallet {
                 if (data) {
                   if (data['status']) {
                     result = Object.assign(result, data);
-                    this.add_trans(account.address, result);
+                    console.log('Send Trans222',result);
+                    this.add_trans(result.from, result);
                     resolve(this.gen_result(result));
                   } else {
                     resolve(this.gen_result(null, 104));

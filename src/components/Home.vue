@@ -110,7 +110,8 @@
         <div v-show="createTabIndex===1"
              class="import-dialog_content">
           <drop-view :items="['true','eth']"
-                     v-model="importForm.coin"></drop-view>
+                     v-model="importForm.coin"
+          type="name"></drop-view>
           <div class="flex-1 flex-column">
             <tab-view
               :tabs="importTabs"
@@ -413,6 +414,9 @@
     created() {
       this.$bus.$on('clearWallets', () => {
         this.actionImportLocal();
+      });
+      this.$bus.$on('rateChanged',()=>{
+        this.actionGetBalance();
       });
 
     },
@@ -880,8 +884,18 @@
             contracts[contract]['password'] = this.account['password'];
             contracts[contract]['keystore'] = this.account['keystore'];
             contracts[contract].currency = wallet.match_currency_usd(contracts[contract]['symbol'], contracts[contract]['amount']);
-            this.contracts.push(contracts[contract]);
-            console.log('Action GetBalance Contract', contracts[contract]);
+            let has=false;
+            for (let imte of this.contracts) {
+              if (imte['privateKey'] == this.account['privateKey']) {
+                has=true;
+              };
+            }
+            if (!has) {
+              this.contracts.push(contracts[contract]);
+              console.log('Action GetBalance Contract', contracts[contract]);
+            }
+
+
           }
         }
         this.actionUpdateMainAccount();
@@ -923,15 +937,17 @@
         if (coin.toUpperCase() == symbol.toUpperCase()) {
 
           for (let account of this.accounts) {
+            console.log('actionGetAllAddresses====',account);
             if (account['coin'].toUpperCase() === coin.toUpperCase()) {
               account['type'] = type;
               account['action'] = 'normal';
               address = account['address'];
-              if (!account['amount']){
-                let wallet = this.getWallet(account['coin']);
-                let result = await wallet.get_balance(account['address']);
-                account['amount']=result['data'];
-              }
+              let wallet = this.getWallet(account['coin']);
+              let result = await wallet.get_balance(account['address']);
+              account['amount']=result['data']/ this.decimals[account['coin'].toLowerCase()];
+              // if (!account['amount']){
+              //
+              // }
               allCoinAccounts.push(account);
               transferBalances.push(`${account['address']} (${account['amount']} ${coin.toUpperCase()})`);
               console.log('actionGetAllAddresses Main Coin', coin, symbol, account);
@@ -961,7 +977,7 @@
                   temp['action'] = 'normal';
                   address = temp['address'];
                   allCoinAccounts.push(temp);
-                  transferBalances.push(`${item['address']} (${balance} ${item['symbol']})`);
+                  transferBalances.push(`${account['address']} (${balance} ${item['symbol']})`);
                   console.log('actionGetAllAddresses Contract', coin, symbol);
                 }
               }
@@ -987,6 +1003,9 @@
       },
       actionTransCoinIndexChange(index) {
         let transCoin = this.transferCoins[index];
+        if (!transCoin) {
+          return
+        }
         console.log('actionTransCoinIndexChange 转账第二步', index, transCoin);
         if (transCoin.indexOf('(') >= 0) {
           let temp = transCoin.replace(')', '');

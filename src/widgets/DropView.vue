@@ -5,13 +5,13 @@
            style="height: 100%;"
            @click="showItem=!showItem">
         <slot></slot>
-        <div class="single-line flex-1">{{getCoin(itemInfo)}}</div>
+        <div class="single-line flex-1">{{type==='name'?getName(itemInfo):getCoin(itemInfo)}}</div>
         <img class="drop_view-arrow" src="../assets/icon/icon_arrow_down.png"/>
       </div>
       <div v-show="showItem" class="drop_view-ground" @click="actionOnItemClick(itemInfo)"></div>
       <transition>
         <div v-show="showItem" class="drop_view" :style="height?{maxHeight:height+'px'}:{}">
-          <div v-for="(item,index) in items" class="drop_view-item" @click="actionOnItemClick(item,index)">{{getCoin(item)}}</div>
+          <div v-for="(item,index) in items" class="drop_view-item" @click="actionOnItemClick(item,index)">{{type==='name'?getName(item):getCoin(item)}}</div>
           <!--<div class="drop_view-item" @click.stop="actionOnItemClick('TRUE')">TRUE</div>-->
         </div>
       </transition>
@@ -30,6 +30,7 @@
       items: '',
       value:'',
       height:'',
+      type:'',
     },
     data() {
       return {

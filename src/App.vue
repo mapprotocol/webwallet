@@ -186,8 +186,7 @@
           lang = 'en';
         } else if (index === 2) {
           lang = 'ko';
-        }
-        ;
+        };
         this.$i18n.locale = lang;
         localStorage.setItem('language', lang);
       },
@@ -210,7 +209,9 @@
           for (let item of resutl) {
             rate_usd[item['token']] = item['price'];
           }
+          rate_usd['UT'] = new Date().toLocaleTimeString();
           localStorage.setItem('rate_usd', JSON.stringify(rate_usd));
+          this.$bus.$emit('rateChanged');
         }
       } catch (e) {
       }

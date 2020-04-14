@@ -200,7 +200,7 @@ class Wallet {
     }
     transfers = transfers[address];
     console.log("=======get_trans_list========",address,transfers);
-    if (transfers) {
+    if (transfers && transfers['items']) {
       return transfers['items'];
     }
     return [];

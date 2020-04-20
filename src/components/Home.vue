@@ -455,6 +455,8 @@
           this.tokenForm.address = '';
           this.tokenForm.profile = '';
           this.tokenForm.decimal = '';
+        }else {
+          this.tokenForm.loading=false;
         }
       },
       showTransfer(newValue) {
@@ -862,6 +864,7 @@
         this.actionGetTransferLog();
       },
       async actionGetBalance() {
+
         let wallet = this.getWallet(this.account.coin);
         if (wallet) {
           this.contracts = [];
@@ -872,6 +875,7 @@
           console.log('Action GetBalance Main', this.account);
           //get contract balance
           let contracts = new Contract().list(this.account.coin);
+          console.log('actionGetBalance 1111',contracts);
           for (let contract in contracts) {
             //get contract address
             let contractBalance = await wallet.get_contract_balance(
@@ -886,18 +890,18 @@
             contracts[contract].currency = wallet.match_currency_usd(contracts[contract]['symbol'], contracts[contract]['amount']);
             let has=false;
             for (let imte of this.contracts) {
-              if (imte['privateKey'] == this.account['privateKey']) {
+              if (imte['privateKey'] == this.account['privateKey']
+              && imte['address']==contract['address']) {
                 has=true;
-              };
+              }
             }
             if (!has) {
               this.contracts.push(contracts[contract]);
               console.log('Action GetBalance Contract', contracts[contract]);
             }
-
-
           }
         }
+        console.log('actionGetBalance 2222',this.contracts);
         this.actionUpdateMainAccount();
       },
       //transfer step.1
@@ -1072,14 +1076,14 @@
       if (!contracts['true']){
         contracts['true']={}
       }
-      contracts['true']['0x735bCe5ecc8455Eb9Bf8270aA138ce05E069b4c1']={
-        address: "0x735bCe5ecc8455Eb9Bf8270aA138ce05E069b4c1",
-        coin: "true",
-        name: "MarcoPolo",
-        profile: "map",
-        decimal: "18",
-        symbol: "MAP",
-      };
+      // contracts['true']['0x735bCe5ecc8455Eb9Bf8270aA138ce05E069b4c1']={
+      //   address: "0x735bCe5ecc8455Eb9Bf8270aA138ce05E069b4c1",
+      //   coin: "true",
+      //   name: "MarcoPolo",
+      //   profile: "map",
+      //   decimal: "18",
+      //   symbol: "MAP",
+      // };
       localStorage.setItem('contracts',JSON.stringify(contracts));
       this.actionImportLocal();
     }

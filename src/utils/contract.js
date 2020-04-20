@@ -18,6 +18,8 @@ class Contract {
     this.action = 'add';
     this.address = address;
     this.coin = coin;
+    this.name = profile;
+    this.symbol = profile;
     this.profile = profile;
     this.decimal = decimal;
     return this;
@@ -61,6 +63,7 @@ class Contract {
         decimal: this.decimal,
         symbol:this.symbol
       };
+      console.log('params',params);
       if (!this.contracts[this.coin]){
         this.contracts[this.coin]={};
       }

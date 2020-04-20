@@ -37,7 +37,7 @@
           <div class="space-y-70"></div>
           <div class="home-left-tips1">{{$t('CNFindUourToken')}}</div>
           <div class="home-left-tips2">{{$t('BelowToAddTokens')}}</div>
-          <div class="home-left-tips3" @click="showAddToken=true">{{$t('AddToken')}}</div>
+          <div class="home-left-tips3" @click="doShowAddToken">{{$t('AddToken')}}</div>
 
         </div>
         <!--right-->
@@ -500,6 +500,9 @@
       },
     },
     methods: {
+      doShowAddToken() {
+        this.showAddToken = true;
+      },
       formatAmount(num) {
         if (num == 0) {
           return '0.00';
@@ -618,8 +621,6 @@
           this.$failed(this.$t('EnterTransNumber'));
           return;
         }
-        console.log(this.transForm);
-        console.log(this.transAccount);
         let wallet = this.getWallet(this.transAccount.coin.toLowerCase());
         if (this.transAccount.action !='mask'){
           let gas = wallet.web3.utils.fromWei(`${this.transForm.gasprice}`);
@@ -698,11 +699,11 @@
           wallet = new WalletTrue(lightwallet);
         }
         //eth
-        else if (this.createForm.coin.toLowerCase() === 'eth') {
+        else if (this.account.coin.toLowerCase() === 'eth') {
           wallet = new WalletEth(lightwallet);
         }
         if (wallet) {
-          await wallet.update_contract(this.tokenForm.address);
+          wallet.update_contract(this.tokenForm.address);
           setTimeout(() => {
             this.showAddToken = false;
           }, 1000);
@@ -875,7 +876,6 @@
           console.log('Action GetBalance Main', this.account);
           //get contract balance
           let contracts = new Contract().list(this.account.coin);
-          console.log('actionGetBalance 1111',contracts);
           for (let contract in contracts) {
             //get contract address
             let contractBalance = await wallet.get_contract_balance(
@@ -901,7 +901,6 @@
             }
           }
         }
-        console.log('actionGetBalance 2222',this.contracts);
         this.actionUpdateMainAccount();
       },
       //transfer step.1
@@ -939,7 +938,6 @@
         let address ='';
         //main
         if (coin.toUpperCase() == symbol.toUpperCase()) {
-
           for (let account of this.accounts) {
             console.log('actionGetAllAddresses====',account);
             if (account['coin'].toUpperCase() === coin.toUpperCase()) {
@@ -1003,7 +1001,6 @@
         }
         this.transferBalances = transferBalances;
         this.transferAccounts = allCoinAccounts;
-        console.log(this.transferAccounts);
       },
       actionTransCoinIndexChange(index) {
         let transCoin = this.transferCoins[index];
@@ -1022,7 +1019,6 @@
         }
         this.transForm.from = '';
         this.actionGetAllAddresses(this.transForm.coin, this.transForm.name);
-
       },
       actionTransFromIndexChange(index) {
         if (index==undefined) {
@@ -1076,14 +1072,14 @@
       if (!contracts['true']){
         contracts['true']={}
       }
-      // contracts['true']['0x735bCe5ecc8455Eb9Bf8270aA138ce05E069b4c1']={
-      //   address: "0x735bCe5ecc8455Eb9Bf8270aA138ce05E069b4c1",
-      //   coin: "true",
-      //   name: "MarcoPolo",
-      //   profile: "map",
-      //   decimal: "18",
-      //   symbol: "MAP",
-      // };
+      contracts['true']['0x735bCe5ecc8455Eb9Bf8270aA138ce05E069b4c1']={
+        address: "0x735bCe5ecc8455Eb9Bf8270aA138ce05E069b4c1",
+        coin: "true",
+        name: "MarcoPolo",
+        profile: "map",
+        decimal: "18",
+        symbol: "MAP",
+      };
       localStorage.setItem('contracts',JSON.stringify(contracts));
       this.actionImportLocal();
     }

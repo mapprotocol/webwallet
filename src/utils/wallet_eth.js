@@ -1,7 +1,7 @@
 import Web3 from 'web3'
 
 import {Wallet} from './wallet'
-
+import Requester from './requester';
 class WalletEth extends Wallet{
 
   constructor(lightWallet) {
@@ -13,20 +13,30 @@ class WalletEth extends Wallet{
   }
 
   async get_contract(address){
-    return new Promise(resolve => {
-      let url = 'https://api.etherscan.io/api?module=contract&action=getabi&address='+address;
-      var xhr = new XMLHttpRequest();
-      xhr.open('GET', url);
-      xhr.send();
-      xhr.onreadystatechange = function(){
-        if ( xhr.readyState == 4 && xhr.status == 200 ) {
-          let res = JSON.parse(xhr.responseText);
-          let contract_json = JSON.parse(res.result);
-          let contract = new this.web3.eth.Contract(contract_json,address);
-          return resolve(this.gen_result(contract));
-        }
-      };
-    });
+    let baseUrl = 'https://truechainapi.truescan.net';
+    let result = await new Requester(baseUrl).post({
+      "contractAddr" : address,
+      "chain" : "ETH"
+    }, '/api/queryAbiByContractAddr',false);
+    let contract_json = JSON.parse(result.data.abi);
+    let contract = new this.web3.eth.Contract(contract_json,address);
+    return this.gen_result(contract);
+
+    // return new Promise(resolve => {
+    //   let url = '';
+    //   var xhr = new XMLHttpRequest();
+    //   xhr.open('POST', url);
+    //   xhr.send();
+    //   xhr.onreadystatechange = function(){
+    //     if ( xhr.readyState == 4 && xhr.status == 200 ) {
+    //       let res = JSON.parse(xhr.responseText);
+    //       console.log(1111111,res);
+    //       let contract_json = JSON.parse(res.result);
+    //       let contract = new this.web3.eth.Contract(contract_json,address);
+    //       return resolve(this.gen_result(contract));
+    //     }
+    //   };
+    // });
   }
 
   async get_balance(address) {

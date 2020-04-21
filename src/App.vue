@@ -192,6 +192,7 @@
       },
       actionClearLocal(){
         localStorage.removeItem('wallets');
+        localStorage.removeItem('transfers');
         this.$bus.$emit('clearWallets');
         this.$success('清除成功')
       }

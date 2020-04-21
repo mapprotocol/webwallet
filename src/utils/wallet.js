@@ -198,7 +198,7 @@ class Wallet {
     } else {
       transfers = {};
     }
-    transfers = transfers[address];
+    transfers = transfers[address.toLowerCase()];
     console.log("=======get_trans_list========",address,transfers);
     if (transfers && transfers['items']) {
       return transfers['items'];
@@ -208,7 +208,7 @@ class Wallet {
 
   //add transfer log
   add_trans(address, data) {
-
+    address = address.toLowerCase();
     let transfersAll = localStorage.getItem('transfers');
     let transfers = {};
     if (transfersAll){

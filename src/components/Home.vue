@@ -1072,14 +1072,14 @@
       if (!contracts['true']){
         contracts['true']={}
       }
-      contracts['true']['0x735bCe5ecc8455Eb9Bf8270aA138ce05E069b4c1']={
-        address: "0x735bCe5ecc8455Eb9Bf8270aA138ce05E069b4c1",
-        coin: "true",
-        name: "MarcoPolo",
-        profile: "map",
-        decimal: "18",
-        symbol: "MAP",
-      };
+      // contracts['true']['0x735bCe5ecc8455Eb9Bf8270aA138ce05E069b4c1']={
+      //   address: "0x735bCe5ecc8455Eb9Bf8270aA138ce05E069b4c1",
+      //   coin: "true",
+      //   name: "MarcoPolo",
+      //   profile: "map",
+      //   decimal: "18",
+      //   symbol: "MAP",
+      // };
       localStorage.setItem('contracts',JSON.stringify(contracts));
       this.actionImportLocal();
     }
@@ -1176,7 +1176,7 @@
       width: 100%;
       font-size: 16px;
       font-weight: bold;
-      color: rgba(247, 122, 0, 1);
+      color: #0987DB;
       line-height: 30px;
       text-align: center;
 
@@ -1197,12 +1197,12 @@
       .home-right-top-logo {
         width: 48px;
         height: 48px;
-        background: rgba(255, 235, 211, 1);
+        background: #E0F3FF;
         border-radius: 50%;
         font-size: 12px;
         font-family: Microsoft YaHei;
         font-weight: bold;
-        color: rgba(203, 121, 24, 1);
+        color: #0071BC;
         text-align: center;
         word-break: break-word;
         .flex-column;
@@ -1251,7 +1251,7 @@
 
     .tab_select {
       text-align: center;
-      color: #FF9211;
+      color: #0071BC;
       font-size: 18px;
       font-family: Microsoft YaHei;
       font-weight: bold;

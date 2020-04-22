@@ -67,14 +67,14 @@ module.exports = {
       // inject cdn on production
       config.plugin('html')
         .tap(args => {
-          args[0].title='Marcopolo';
+          args[0].title='True';
           args[0].cdn = cdn;
           return args;
         });
     }else {
       config.plugin('html')
         .tap(args => {
-          args[0].title='Marcopolo';
+          args[0].title='True';
           return args;
         });
     }

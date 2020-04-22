@@ -89,7 +89,7 @@
   }
 
   .slider_view-step {
-    background-color: #FF9211;
+    background-color: #0071BC;
     color: white;
     display: inline-block;
     position: absolute;
@@ -110,7 +110,7 @@
     -webkit-appearance: none;
     width: 300px;
     border-radius: 7px; /*这个属性设置使填充进度条时的图形为圆角*/
-    background: -webkit-linear-gradient(#FF9211, #FF9211) no-repeat;
+    background: -webkit-linear-gradient(#0071BC, #0071BC) no-repeat;
     background-size: 0% 100%;
 
     &::-webkit-slider-thumb {
@@ -135,9 +135,9 @@
       height: 21px;
       width: 21px;
       margin-top: -6px; /*使滑块超出轨道部分的偏移量相等*/
-      background: #FF9211;
+      background: #0071BC;
       border-radius: 50%; /*外观设置为圆形*/
-      border: solid 0.125em #FF9211; /*设置边框*/
+      border: solid 0.125em #0071BC; /*设置边框*/
       box-shadow: 0 .125em .125em #3b4547; /*添加底部阴影*/
     }
   }

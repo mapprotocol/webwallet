@@ -60,7 +60,7 @@
     box-shadow: 0px 1px 5px 0px rgba(171, 171, 171, 0.44);
 
     .nav-bar-version{
-      color:rgba(255,146,17,1);
+      color:#0071BC;
       font-size: 12px;
       font-weight: bold;
       padding-left: 5px;

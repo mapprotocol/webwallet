@@ -60,8 +60,8 @@
   }
 
   .tab_view-item-select {
-    color: #FF9211;
-    border-bottom-color: #FF9211 !important;
+    color: #0071BC;
+    border-bottom-color: #0071BC !important;
   }
 
 </style>

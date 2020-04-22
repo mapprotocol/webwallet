@@ -317,9 +317,9 @@ export default {
     'ko': '본 지갑은 이미 존재합니다.'
   },
   'MarcopoloWallet': {
-    'zh': 'Marcopolo在线钱包',
-    'en': 'Marcopolo Wallet',
-    'ko': 'Marcopolo online 지갑'
+    'zh': 'True在线钱包',
+    'en': 'True Wallet',
+    'ko': 'True online 지갑'
   },
   'CurrentGasFee': {
     'zh': '当前网络平均gas价格',

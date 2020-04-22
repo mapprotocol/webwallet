@@ -63,7 +63,7 @@
     border-radius: 50%;
     mask: radial-gradient(transparent @mask, #000 @mask);
     overflow: hidden;
-    background: conic-gradient(rgba(255,255,255,0.4),#FF9211);
+    background: conic-gradient(rgba(255,255,255,0.4),#0071BC);
     filter: blur(2px);
     animation: right-rotate 4s infinite;
   }

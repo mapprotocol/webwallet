@@ -38,6 +38,15 @@
     <script src="<%= htmlWebpackPlugin.options.cdn.js[i] %>"></script>
     <% } %>
     <!-- built files will be auto injected -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-153243381-11"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-153243381-11');
+    </script>
   </body>
 <script>
   console.log(`┏━━━━━━━━━━━━━━━━━┓\n┃   Happy Work    ┃\n┃   Happy Life    ┃\n┗━━━━━━━━━━━━━━━━━┛`)
